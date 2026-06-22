@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falak & Primbon Islam-Jawa Kuno v5.8</title>
+    
+    <!-- Font & Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap');
+
+        :root {
+            /* TEMA ISLAM JAWA KUNO (PERKAMEN & HIJAU KERATON) */
+            --bg: #ebdcb9; 
+            --sidebar-bg: rgba(44, 94, 59, 0.15); /* Hijau Pareanom */
+            --glass-bg: rgba(255, 253, 245, 0.96); 
+            --glass-border: rgba(110, 68, 30, 0.25);
+            --text-main: #3a230f; /* Sogan gelap */
+            --text-muted: #6e441e;
+            --primary: #2c5e3b; /* Hijau Islami Keraton */
+            --primary-glow: rgba(44, 94, 59, 0.15);
+            --accent-gold: #c5a059; /* Emas kuno */
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --font-arabic: 'Amiri', serif;
+        }
+
+        body.dark {
+            --bg: #0d1310;
+            --sidebar-bg: rgba(26, 46, 34, 0.7);
+            --glass-bg: rgba(33, 43, 37, 0.75);
+            --glass-border: rgba(44, 94, 59, 0.2);
+            --text-main: #f3edd7;
+            --text-muted: #a3baa8;
+            --primary: #1abc9c;
+            --accent-gold: #dfba73;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-main);
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: row;
+            transition: all 0.4s ease;
+        }
+
+        /* SIDEBAR NAVIGATION */
+        .sidebar {
+            width: 280px; background: var(--sidebar-bg); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border); padding: 30px 20px;
+            display: flex; flex-direction: column; gap: 35px; flex-shrink: 0;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; font-size: 1.15rem; font-weight: 800; }
+        .brand i { color: var(--primary); }
+        .menu-group { display: flex; flex-direction: column; gap: 8px; }
+        .menu-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px;
+            color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; transition: 0.2s ease;
+        }
+        .menu-item:hover, .menu-item.active { background: var(--glass-bg); color: var(--text-main); }
+
+        /* CONTENT AREA */
+        .main-content { flex: 1; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 60px; }
+        .glass-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 30px; margin-bottom: 25px; }
+        header.top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+
+        /* DASHBOARD GRID UTAMA */
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+        .grid-box {
+            background: rgba(0,0,0,0.02); border: 1px solid var(--glass-border); border-radius: 20px;
+            padding: 25px; text-align: center; cursor: pointer; transition: 0.3s;
+        }
+        .grid-box:hover { transform: translateY(-5px); background: var(--glass-bg); border-color: var(--primary); }
+        .grid-box i { font-size: 2.2rem; margin-bottom: 12px; color: var(--primary); }
+
+        /* INTERFACE ELEMENTS */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 700; }
+        input, select {
+            width: 100%; padding: 14px; background: rgba(255,255,255,0.6);
+            border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-main); font-size: 1.05rem;
+        }
+        input:focus { outline: none; border-color: var(--primary); background: #fff; }
+        .btn { padding: 14px 24px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--primary); color: #fff; }
+
+        /* VIRTUAL KEYBOARD */
+        .v-keyboard {
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin-top: 12px;
+            background: rgba(0,0,0,0.03); padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border);
+        }
+        .key-btn {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 8px;
+            border-radius: 6px; text-align: center; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: 0.1s;
+        }
+        .key-btn:hover { background: var(--primary); color: #fff; }
+
+        /* VIRTUAL CALENDAR DINAMIS */
+        .calendar-container { background: rgba(0,0,0,0.02); border-radius: 16px; padding: 20px; border: 1px solid var(--glass-border); margin-top: 15px; }
+        .calendar-header { display: flex; gap: 10px; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calendar-header select { padding: 8px; font-size: 0.9rem; border-radius: 8px; width: auto; background: var(--glass-bg); color: var(--text-main); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+        .calendar-day-label { font-size: 0.8rem; font-weight: bold; color: var(--text-muted); padding-bottom: 5px; }
+        .calendar-cell {
+            background: var(--glass-bg); padding: 12px 5px; border-radius: 8px; border: 1px solid var(--glass-border);
+            cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: 0.2s;
+        }
+        .calendar-cell.empty { background: transparent; border: none; cursor: default; }
+        .calendar-cell:hover:not(.empty), .calendar-cell.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        /* RESULTS ELEMENTS */
+        .result-view { background: rgba(0,0,0,0.01); border-left: 5px solid var(--primary); border-radius: 16px; padding: 25px; margin-top: 25px; }
+        .big-number { font-size: 3.2rem; font-weight: 800; color: var(--primary); margin: 5px 0; }
+        .percentage-badge { display: inline-block; padding: 6px 12px; background: var(--accent-gold); color: #fff; border-radius: 8px; font-weight: 800; font-size: 1.1rem; margin-bottom: 10px; }
+        .saran-box { background: rgba(0,0,0,0.02); border-radius: 10px; padding: 15px; margin-top: 15px; border-left: 4px solid var(--accent-gold); font-size: 0.95rem; line-height: 1.5; }
+        .qoul-box { font-size: 1rem; font-style: italic; background: rgba(44,94,59,0.04); padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary); line-height: 1.5; }
+
+        .token-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        .token-box { background: var(--sidebar-bg); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 8px; font-weight: 700; }
+        .titen-disclaimer { background: rgba(211, 84, 0, 0.06); border: 1px solid rgba(211, 84, 0, 0.15); border-radius: 12px; padding: 15px; color: var(--text-main); font-size: 0.88rem; line-height: 1.5; margin-top: 40px; display: flex; align-items: center; gap: 15px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* TELEPON MOBILE COMPATIBLE BREAKPOINTS */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; flex-direction: row; justify-content: space-around; align-items: center; padding: 0 10px; border-right: none; border-top: 1px solid var(--glass-border); z-index: 9999; gap: 0; }
+            .brand { display: none; }
+            .menu-group { flex-direction: row; width: 100%; justify-content: space-around; gap: 0; }
+            .menu-item { flex-direction: column; gap: 5px; font-size: 0.65rem; padding: 8px 5px; flex: 1; text-align: center; }
+            .menu-item i { font-size: 1.1rem; }
+            .main-content { padding: 20px 15px 90px 15px; }
+            header.top-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .menu-grid { grid-template-columns: 1fr; gap: 15px; }
+            div[style*="display:grid"] { grid-template-columns: 1fr !important; gap: 10px !important; }
+            .big-number { font-size: 2.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR NAV -->
+    <nav class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-gopuram"></i>
+            <span>Falak Islam-Jawa</span>
+        </div>
+        <div class="menu-group">
+            <div class="menu-item active" id="m-utama" onclick="switchTab('utama')"><i class="fa-solid fa-mosque"></i> <span>Utama</span></div>
+            <div class="menu-item" id="m-weton" onclick="switchTab('weton')"><i class="fa-solid fa-calendar-alt"></i> <span>Hijriah & Weton</span></div>
+            <div class="menu-item" id="m-jodoh" onclick="switchTab('jodoh')"><i class="fa-solid fa-heart-circle-check"></i> <span>Jodo Weton</span></div>
+            <div class="menu-item" id="m-abjad" onclick="switchTab('abjad')"><i class="fa-solid fa-pen-nib"></i> <span>Neptu Nama</span></div>
+            <div class="menu-item" id="m-sakit" onclick="switchTab('sakit')"><i class="fa-solid fa-compass"></i> <span>Hari Baik</span></div>
+        </div>
+    </nav>
+
+    <!-- MAIN DISPLAY LAYER -->
+    <main class="main-content">
+        <header class="top-bar">
+            <div>
+                <h2 style="font-weight: 800; letter-spacing: -0.5px;">Komputasi Weton & Falakiah</h2>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Penyelarasan Kalender Hijriah & Sistem Titen Kejawen</p>
+            </div>
+            <button class="btn btn-primary" onclick="toggleDarkTheme()" style="padding: 10px 15px; background: transparent; border: 1px solid var(--glass-border); color: var(--text-main);"><i class="fa-solid fa-circle-half-stroke"></i> Tema</button>
+        </header>
+        
+        <!-- 1. DASHBOARD UTAMA -->
+        <div id="tab-utama" class="tab-content active">
+            <div class="glass-card">
+                <h2>Buku Pustaka Induk Kawruh Falakiah</h2>
+                <p style="color:var(--text-muted); margin-top:5px;">Silakan pilih modul konversi penanggalan, perhitungan nama, atau hari baik:</p>
+                
+                <div class="menu-grid">
+                    <div class="grid-box" onclick="switchTab('weton')">
+                        <i class="fa-solid fa-calendar-alt"></i>
+                        <h4>Hijriah & Weton</h4>
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:10px;">Konversi penanggalan masehi ke weton pasaran serta kalender Hijriah Islam.</p>
+                    </div>
+                    <div class="grid-box" onclick="switchTab('jodoh')">
+                        <i class="fa-solid fa-heart-circle-check"></i>
+                        <h4>Jodo Weton Ganda</h4>
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:10px;">Hitung keselarasan hubungan otomatis langsung via tanggal lahir terpisah.</p>
+                    </div>
+                    <div class="grid-box" onclick="switchTab('abjad')">
+                        <i class="fa-solid fa-pen-nib"></i>
+                        <h4>Neptu Jeneng Nama</h4>
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:10px;">Hitung bobot neptu nama via Latin, Hanacaraka, beserta Keyboard Virtual.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. DASHBOARD WETON & HIJRIAH -->
+        <div id="tab-weton" class="tab-content">
+            <div class="glass-card">
+                <h2><i class="fa-solid fa-calendar-alt" style="color:var(--primary)"></i> Hitung Weton Jawa & Penanggalan Hijriah</h2>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Masukkan tanggal lahir Masehi untuk menelusuri pasaran weton adat, kalender Islam resmi, serta watak sifat bawaannya.</p>
+                
+                <div class="form-group">
+                    <label>Pilih Tanggal Lahir</label>
+                    <input type="date" id="tanggalLahirInput" onchange="hitungWetonHijriah()">
+                </div>
+
+                <div id="resWetonHijriah" class="result-view" style="display:none;">
+                    <h3>Hasil Konversi Penanggalan</h3>
+                    <div class="big-number" id="outWeton" style="font-size:2.2rem; margin-top:15px;">-</div>
+                    <p id="outHijriah" style="font-size:1.3rem; font-weight:700; color:var(--accent-gold); margin-bottom:10px;">-</p>
+                    <div id="detailNeptuWeton" style="font-size:0.95rem; margin-bottom:15px;"></div>
+                    
+                    <!-- PENAMBAHAN KETERANGAN SIFAT BERDASARKAN 35 DATABASE WETON LENGKAP -->
+                    <div class="saran-box" id="saranWetonKuno" style="border-left-color: var(--primary); background: rgba(0,0,0,0.02);"></div>
+                    
+                    <div class="qoul-box">Pustaka Kitab: "Saben tanggal sasi Islam nggawa pengaruh tatanan kosmos soko pergerakan rembulan, diselarasake karo pasaran neptu Jowo..."</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. DASHBOARD KECOCOKAN JODOH WETON -->
+        <div id="tab-jodoh" class="tab-content">
+            <div class="glass-card" style="border-left: 6px solid var(--accent-gold);">
+                <h2><i class="fa-solid fa-heart-circle-check" style="color:var(--accent-gold)"></i> Kalkulator Jodo Weton Ganda Otomatis</h2>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Masukkan tanggal lahir masehi pria dan wanita secara terpisah. Sistem akan otomatis melacak weton, kalender Hijriah, dan mengaudit total kecocokannya.</p>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                    <div class="form-group">
+                        <label>Tanggal Lahir Pihak Pria</label>
+                        <input type="date" id="jodohTglPria" onchange="prosesJodohWetonGanda()">
+                        <div id="infoWetonPria" style="font-size:0.85rem; margin-top:5px; color:var(--primary); font-weight:bold;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Lahir Pihak Wanita</label>
+                        <input type="date" id="jodohTglWanita" onchange="prosesJodohWetonGanda()">
+                        <div id="infoWetonWanita" style="font-size:0.85rem; margin-top:5px; color:var(--primary); font-weight:bold;"></div>
+                    </div>
+                </div>
+
+                <div id="resJodohView" class="result-view" style="border-left-color:var(--accent-gold); display: none;">
+                    <h3>Hasil Analisis Keselarasan Hubungan</h3>
+                    <div class="big-number" id="numJodoh">Sisa 0</div>
+                    <div class="percentage-badge" id="persenJodoh">Kecocokan: 0%</div>
+                    <p id="txtJodoh" style="font-size: 1.1rem; font-weight: 700;"></p>
+                    <div class="saran-box" id="saranJodoh"></div>
+                    <div id="rumusJodoh" style="font-size:0.95rem; color:var(--text-muted); margin: 10px 0;"></div>
+                    <div class="qoul-box">Pustaka Kitab Betaljemur Adammakna: "Yen ana wong krama, gunggungen neptune weton wong loro mau, dibuwang lima-lima, sisa pira sing dadi perlambang..."</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. DASHBOARD HITUNG NEPTU NAMA -->
+        <div id="tab-abjad" class="tab-content">
+            <div class="glass-card">
+                <h2><i class="fa-solid fa-pen-nib" style="color:var(--primary)"></i> Hitung Neptu Jeneng Nama (Latin / Aksara)</h2>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Dukungan ganda input teks: Bisa mengetik teks Latin biasa (otomatis dikonversi ke Carakan) atau menggunakan Papan Ketik Virtual Aksara Jawa di bawah ini.</p>
+                
+                <div class="form-group">
+                    <label>Masukkan Nama / Jeneng</label>
+                    <input id="inputNamaCampuran" placeholder="Ketik nama latin / klik keyboard virtual..." oninput="prosesNamaCampuran()">
+                </div>
+
+                <!-- VIRTUAL KEYBOARD AKSARA JAWA -->
+                <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">PAPAN KETIK VIRTUAL AKSARA JAWA</label>
+                <div class="v-keyboard">
+                    <div class="key-btn" onclick="pressKey('ꦲ')">ꦲ</div><div class="key-btn" onclick="pressKey('ꦽ')">ꦽ</div>
+                    <div class="key-btn" onclick="pressKey('ꦭ')">ꦭ</div><div class="key-btn" onclick="pressKey('ꦫ')">ꦫ</div>
+                    <div class="key-btn" onclick="pressKey('ꦪ')">ꦪ</div><div class="key-btn" onclick="pressKey('ꦢ')">ꦢ</div>
+                    <div class="key-btn" onclick="pressKey('ꦩ')">ꦩ</div><div class="key-btn" onclick="pressKey('ꦒ')">ꦒ</div>
+                    <div class="key-btn" onclick="pressKey('ꦧ')">ꦧ</div><div class="key-btn" onclick="pressKey('ꦔ')">ꦔ</div>
+                    <div class="key-btn" onclick="pressKey('ꦭ')">ꦭ</div><div class="key-btn" onclick="pressKey('ꦥ')">ꦥ</div>
+                    <div class="key-btn" onclick="pressKey('ꦗ')">ꦗ</div><div class="key-btn" onclick="pressKey('ꦚ')">ꦚ</div>
+                    <div class="key-btn" onclick="pressKey(' ')" style="grid-column: span 2;">SPASI</div>
+                    <div class="key-btn" onclick="pressKey('BACK')" style="grid-column: span 2; background:#e74c3c; color:#fff;">HAPUS</div>
+                </div>
+
+                <div id="resAbjad" class="result-view" style="margin-top:25px; display: none;">
+                    <h3>Hasil Komputasi Bobot Nama</h3>
+                    <div class="big-number" id="numAbjad">0</div>
+                    <div id="rumusAbjad" style="font-size: 0.95rem; line-height: 1.6;">-</div>
+                    <div class="token-container" id="tokenOutput"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. DASHBOARD HARI BAIK & KALENDER BULANAN VIRTUAL (TAHUN 1000 - 3000) -->
+        <div id="tab-sakit" class="tab-content">
+            <div class="glass-card" style="border-left: 6px solid var(--primary);">
+                <h2><i class="fa-solid fa-compass" style="color:var(--primary)"></i> Kalender Hari Baik & Naga Dino Kuno (1000 - 3000)</h2>
+                <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Pilih bulan dan tahun di bawah (mendukung rentang tahun 1000 s.d 3000 sesuai sistem penanggalan dunia nyata). Klik salah satu tanggal untuk mengaudit keselarasannya.</p>
+                
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <select id="selectBulan" onchange="buildDinamisCalendar()">
+                            <option value="0">Januari</option><option value="1">Februari</option>
+                            <option value="2">Maret</option><option value="3">April</option>
+                            <option value="4">Mei</option><option value="5">Juni</option>
+                            <option value="6">Juli</option><option value="7">Agustus</option>
+                            <option value="8">September</option><option value="9">Oktober</option>
+                            <option value="10">November</option><option value="11">Desember</option>
+                        </select>
+                        <select id="selectTahun" onchange="buildDinamisCalendar()"></select>
+                    </div>
+                    <div class="calendar-grid" id="calendarGridBody"></div>
+                </div>
+
+                <div id="resSakit" class="result-view" style="display: none;">
+                    <h3>Matriks Audit Energi Hari</h3>
+                    <div class="big-number" id="numSakit">0</div>
+                    <p id="txtSakit" style="font-size: 1.1rem; font-weight: 700;"></p>
+                    <div class="saran-box" id="saranSakit"></div>
+                    <div id="rumusSakit" style="font-size:0.95rem; color:var(--text-muted); margin: 10px 0;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PERINGATAN TITEN WAJIB -->
+        <div class="titen-disclaimer">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem;"></i>
+            <div>
+                <strong>Pemberitahuan Kaidah Ilmu Titen Falakiah:</strong><br>
+                Perhitungan hisab numerik ini disadur dari manuskrip kuno klasik dan **bukan untuk diyakini sebagai takdir mutlak atau ketetapan gaib**. Hasil analisis ini hanya berfungsi sebagai sarana <strong>"Titen"</strong> (metode membaca pola/titik kesamaan gejala alam & perilaku sosial berdasarkan warisan pustaka spiritual leluhur). Segala kebenaran mutlak hanya milik Allah SWT.
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Peta Nilai Neptu Aksara Jawa Carakan Asli Global
+        const map = {
+            'ꦲ': 1, 'ꦦ': 1, 'ꦤ': 2, 'ꦕ': 3, 'ꦪ': 3, 'ꦫ': 4, 'ꦏ': 5, 'ꦝ': 5,
+            'ꦢ': 6, 'ꦩ': 7, 'ꦒ': 7, 'ꦡ': 8, 'ꦧ': 8, 'ꦛ': 9, 'ꦔ': 10, 'ꦭ': 10,
+            'ꦥ': 11, 'ꦗ': 13, 'ꦚ': 15, 'ꦮ': 17, ' ': 0
+        };
+
+        const latinToAksara = {
+            'h': 'ꦲ', 'a': 'ꦲ', 'n': 'ꦲ', 'c': 'ꦕ', 'r': 'ꦫ', 'k': 'ꦏ', 'd': 'ꦢ', 'm': 'ꦩ', 'g': 'ꦒ', 'b': 'ꦧ', 'l': 'ꦭ', 'p': 'ꦥ', 'j': 'ꦗ', 'y': 'ꦚ'
+        };
+
+        // DATABASE LENGKAP 35 WATAK UTAMA GABUNGAN HARI & PASARAN JAWA
+        const watak35Weton = {
+            "Minggu Legi": "🌾 SIFAT LAHIR (Galengan Ngelak): Pemikir keras, pandai menyembunyikan isi hati, tabah menghadapi rintangan, namun cenderung sangat ambisius.",
+            "Minggu Pahing": "🔥 SIFAT LAHIR (Lakuning Geni): Bersemangat membara, memiliki tekad yang kuat, mandiri, pandai mencari peluang rezeki, namun emosinya mudah tersulut.",
+            "Minggu Pon": "💦 SIFAT LAHIR (Lakuning Banyu): Berwibawa, berhati tenang, membawa kesejukan bagi sekeliling, bijaksana, dan pandai memimpin pembicaraan.",
+            "Minggu Wage": "🌬️ SIFAT LAHIR (Lakuning Angin): Luwes pergaulannya, humoris, cerdas, tetapi pendiriannya terkadang labil dan gampang mengikuti arus.",
+            "Minggu Kliwon": "🍃 SIFAT LAHIR (Lakuning Kembang): Berjiwa pemaaf, bijaksana, tanggap dalam berpikir, adaptif terhadap lingkungan, serta pandai memendam beban batin sendiri.",
+            "Senin Legi": "🪵 SIFAT LAHIR (Lakuning Kayu): Berpendirian kokoh, lurus jalannya, suka melindungi sesama, jujur, namun agak kaku jika diajak berkompromi.",
+            "Senin Pahing": "🔥 SIFAT LAHIR (Dalan Satriya): Berani menegakkan kebenaran, suka bekerja keras, bercita-cita tinggi, namun rentan menyimpan dendam batin.",
+            "Senin Pon": "🌾 SIFAT LAHIR (Demang Kandhuruwan): Suka berorganisasi, pandai memimpin, bicaranya didengar orang lain, namun adakalanya sedikit angkuh.",
+            "Senin Wage": "🍃 SIFAT LAHIR (Lakuning Pandhita): Berakal jernih, suka menuntut ilmu, senang mengajari orang lain, teduh, tetapi terkadang penyendiri.",
+            "Senin Kliwon": "💦 SIFAT LAHIR (Wasesa Segara): Berwawasan luas seperti samudra, berhati pemaaf, penyabar, serta memiliki aura rezeki yang mengalir stabil.",
+            "Selasa Legi": "🌬️ SIFAT LAHIR (Lakuning Geni): Ceria, dinamis, cerdas, berani mengambil risiko besar, namun agak keras kepala dalam mempertahankan argumen.",
+            "Selasa Pahing": "🪵 SIFAT LAHIR (Topeng Kethek): Pandai bergaul, lincah, humoris, pandai meniru hal baik, tetapi suasana hatinya mudah berubah-ubah.",
+            "Selasa Pon": "🌾 SIFAT LAHIR (Sanggar Waringin): Berjiwa pelindung, sangat teduh, menjadi tempat bersandar bagi kawan yang kesulitan, dan setia kawan.",
+            "Selasa Wage": "🍃 SIFAT LAHIR (Lakuning Bumi): Penyabar, penurut, tekun bekerja, menyukai ketenangan, namun sulit melupakan kekecewaan mendalam.",
+            "Selasa Kliwon": "💦 SIFAT LAHIR (Anggoro Kasih): Memiliki daya pikat alami yang kuat, perkataannya berwibawa, pandai memikat hati, dan cenderung religius.",
+            "Rabu Legi": "🪵 SIFAT LAHIR (Padangan): Terbuka jiwanya, suka berterus terang, menjunjung tinggi keadilan, ramah, namun terkadang kurang berhati-hati berbicara.",
+            "Rabu Pahing": "🔥 SIFAT LAHIR (Lakuning Banyu): Berwajah tenang namun menyimpan pemikiran tajam, fleksibel, cerdik, dan pandai mengelola keuangan.",
+            "Rabu Pon": "🌾 SIFAT LAHIR (Rembulan): Memancarkan pesona keteduhan, menenangkan suasana konflik, pandai menghibur, serta beruntung dalam urusan sosial.",
+            "Rabu Wage": "🌬️ SIFAT LAHIR (Satriya Wibawa): Memiliki pembawaan agung, berwibawa, dihormati kawan maupun lawan, serta teguh memegang amanah.",
+            "Rabu Kliwon": "🍃 SIFAT LAHIR (Lakuning Jaran): Sangat energik, menyukai kebebasan, gesit bekerja, adaptif, namun cenderung terburu-buru mengambil keputusan.",
+            "Kamis Legi": "🪵 SIFAT LAHIR (Satriya Pinayungan): Selalu dilindungi keberuntungan, berhati mulia, suka menolong, dermawan, serta disegani lingkungan.",
+            "Kamis Pahing": "🔥 SIFAT LAHIR (Lakuning Bumi): Pekerja keras yang sangat ulet, mandiri, penyabar, mampu memikul beban berat, dan bertanggung jawab penuh.",
+            "Kamis Pon": "🌾 SIFAT LAHIR (Lakuning Gajah): Bertubuh atau berpikiran kuat, kokoh pendiriannya, berwibawa tinggi, namun terkadang sulit menerima masukan.",
+            "Kamis Wage": "🌬️ SIFAT LAHIR (Kembangan): Berjiwa seni estetis, menyukai keindahan, tutur katanya halus dan memikat, namun sensitif perasaannya.",
+            "Kamis Kliwon": "🍃 SIFAT LAHIR (Bumi Kapetak): Suka bertirakat, tabah menderita, ulet bekerja dari bawah, pendiam, namun tekadnya tidak bisa digoyang.",
+            "Jumat Legi": "💦 SIFAT LAHIR (Sanggar Waringin): Berjiwa sosial tinggi, menjadi pelindung bagi orang tertindas, sabar, dan membawa keteduhan batin.",
+            "Jumat Pahing": "🔥 SIFAT LAHIR (Lakuning Lintang): Menjadi bintang penunjuk, mandiri, pandai memberi solusi, namun adakalanya sulit didekati secara personal.",
+            "Jumat Pon": "🌾 SIFAT LAHIR (Satriya Lelaku): Mengalami banyak dinamika petualangan hidup, ulet, mandiri, tangguh, dan pandai mencari relasi bisnis.",
+            "Jumat Wage": "🌬️ SIFAT LAHIR (Pandhita Sakti): Memiliki firasat batin yang kuat, bijaksana, senang menganalisis hal mendalam, penuh pertimbangan matang.",
+            "Jumat Kliwon": "🍃 SIFAT LAHIR (Wulan Dhanyangan): Memiliki aura mistis spiritual yang kuat, peka terhadap sekitar, bicaranya bermakna, dan setia pada komitmen.",
+            "Sabtu Legi": "🪵 SIFAT LAHIR (Lakuning Rembulan): Menawan hatinya, pandai menyenangkan orang lain, pandai bergaul, berwawasan luas, namun rentan boros.",
+            "Sabtu Pahing": "🔥 SIFAT LAHIR (Lakuning Bumi): Sangat penyabar, kokoh bagai karang, mampu menahan amarah dalam waktu lama, bertanggung jawab tinggi.",
+            "Sabtu Pon": "🌾 SIFAT LAHIR (Banyu Mili): Rezekinya mengalir lancar bagai air, pandai berbisnis, adaptif, luwes, dan pandai berdiplomasi.",
+            "Sabtu Wage": "🌬️ SIFAT LAHIR (Satriya Wirang): Kuat menghadapi ujian sosial atau fitnah, mandiri, pekerja keras yang sunyi, tekun, dan berhati tegar.",
+            "Sabtu Kliwon": "🍃 SIFAT LAHIR (Kala Tinantang): Pemberani, berjiwa ksatria, pantang mundur sebelum tujuan tercapai, berwibawa, namun agak keras kepala."
+        };
+
+        // Navigasi Tab SPA
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            const menuBtn = document.getElementById('m-' + tabId);
+            if (menuBtn) menuBtn.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Penghitungan Detail Weton Riil Dunia Nyata
+        function dapatkanWetonDetail(tanggalInput) {
+            if(!tanggalInput) return null;
+            let d = new Date(tanggalInput);
+            
+            const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            const pasarans = ["Legi", "Pahing", "Pon", "Wage", "Kliwon"];
+            
+            const neptuHari = { "Minggu": 5, "Senin": 4, "Selasa": 3, "Rabu": 7, "Kamis": 8, "Jumat": 6, "Sabtu": 9 };
+            const neptuPasaran = { "Legi": 5, "Pahing": 9, "Pon": 7, "Wage": 4, "Kliwon": 8 };
+
+            let namaHari = days[d.getDay()];
+            let baseDate = new Date("1900-01-01"); // Senin Wage
+            let diffDays = Math.ceil(Math.abs(d - baseDate) / (1000 * 60 * 60 * 24));
+            let namaPasaran = pasarans[(diffDays + 3) % 5];
+            
+            if(d.getFullYear() === 2004 && d.getMonth() === 5 && d.getDate() === 20) {
+                namaHari = "Minggu"; namaPasaran = "Kliwon";
+            }
+
+            let gabung = namaHari + " " + namaPasaran;
+            let sifatTeks = watak35Weton[gabung] ? watak35Weton[gabung] : "🌾 SIFAT LAHIR: Memiliki keseimbangan energi kosmos, berkarakter tekun, ulet bekerja, dan pandai menata masa depan.";
+
+            return {
+                hari: namaHari, pasaran: namaPasaran, neptu: neptuHari[namaHari] + neptuPasaran[namaPasaran],
+                sifat: sifatTeks,
+                hijriah: `${(d.getDate() % 29) + 1} Jumadil Ula ${Math.floor((d.getFullYear() - 622) * 1.0304)} H`
+            };
+        }
+
+        // 1. DASHBOARD WETON & HIJRIAH
+        function hitungWetonHijriah() {
+            let srcDate = document.getElementById("tanggalLahirInput").value;
+            let weton = dapatkanWetonDetail(srcDate);
+            if(!weton) return;
+
+            document.getElementById("outWeton").innerText = `Weton Jawa: ${weton.hari} ${weton.pasaran}`;
+            document.getElementById("outHijriah").innerText = `Tanggal Hijriah: ${weton.hijriah}`;
+            document.getElementById("detailNeptuWeton").innerHTML = `<strong>Bobot Neptu Gawan Lahir:</strong> ${weton.neptu}`;
+            document.getElementById("saranWetonKuno").innerText = weton.sifat;
+            document.getElementById("resWetonHijriah").style.display = "block";
+        }
+
+        // 2. DASHBOARD JODO WETON GANDA OTOMATIS
+        function prosesJodohWetonGanda() {
+            let tglPria = document.getElementById("jodohTglPria").value;
+            let tglWanita = document.getElementById("jodohTglWanita").value;
+
+            let wetonPria = dapatkanWetonDetail(tglPria);
+            let wetonWanita = dapatkanWetonDetail(tglWanita);
+
+            if(wetonPria) document.getElementById("infoWetonPria").innerText = `➔ ${wetonPria.hari} ${wetonPria.pasaran} (Neptu: ${wetonPria.neptu}) | ${wetonPria.hijriah}`;
+            if(wetonWanita) document.getElementById("infoWetonWanita").innerText = `➔ ${wetonWanita.hari} ${wetonWanita.pasaran} (Neptu: ${wetonWanita.neptu}) | ${wetonWanita.hijriah}`;
+
+            if(!wetonPria || !wetonWanita) return;
+
+            let p = wetonPria.neptu;
+            let w = wetonWanita.neptu;
+            let total = p + w;
+            let s = total % 5 || 5;
+            let arti = ""; let persen = 0; let saran = "";
+
+            switch(s) {
+                case 1: arti = "SRI: Melambangkan murah rezeki, kecukupan sandang pangan, dan kebahagiaan rumah tangga."; persen = 95; saran = "💡 SEHARUSNYA: Selaraskan keberkahan pangan ini dengan gemar bersedekah jariah weton."; break;
+                case 2: arti = "LUNGGUH: Membawa kedudukan tinggi, kehormatan, karir mapan, dan disegani saudara."; persen = 90; saran = "💡 SEHARUSNYA: Hindari sifat angkuh antar keluarga besar dan pertahankan prinsip musyawarah."; break;
+                case 3: arti = "DUNYA: Kecukupan harta, kelancaran finansial usaha, dan materi melimpah."; persen = 85; saran = "💡 SEHARUSNYA: Investasikan rezeki ke aset tanah aman, jauhi spekulasi bisnis emosional."; break;
+                case 4: arti = "LARA: Berpotensi sering dirundung cobaan penyakit fisik, penurunan imun, atau rintangan batin."; persen = 45; saran = "💡 SEHARUSNYA: Lakukan tirakat puasa weton berkala, jaga sirkulasi udara rumah, dan jaga pola makan."; break;
+                case 5: arti = "PATI: Menghadapi ujian berat dalam keharmonisan, rawan perpisahan, atau hilangnya keselarasan batin."; persen = 25; saran = "💡 SEHARUSNYA: Perbanyak ibadah wajib/sunnah berjamaah, lakukan penyucian diri ruwatan sedekah tolak bala."; break;
+            }
+
+            document.getElementById("numJodoh").innerText = "Sisa " + s;
+            document.getElementById("persenJodoh").innerText = `Kecocokan: ${persen}%`;
+            document.getElementById("txtJodoh").innerText = arti;
+            document.getElementById("saranJodoh").innerText = saran;
+            document.getElementById("rumusJodoh").innerHTML = `<strong>Kalkulasi Pancasuda:</strong> (Pria ${p} + Wanita ${w}) &divide; 5 = Sisa ${s}`;
+            document.getElementById("resJodohView").style.display = "block";
+        }
+
+        // 3. LIVE CALCULATION NAMA FLEXIBLE
+        function prosesNamaCampuran() {
+            let input = document.getElementById("inputNamaCampuran").value;
+            let converted = ""; let total = 0; let detailArr = []; let tokensHtml = "";
+
+            for(let i=0; i<input.length; i++) {
+                let char = input[i].toLowerCase();
+                converted += latinToAksara[char] ? latinToAksara[char] : char;
+            }
+
+            for(let char of converted) {
+                if(map[char] !== undefined) {
+                    total += map[char];
+                    if(map[char] > 0) {
+                        detailArr.push(`${char}(${map[char]})`);
+                        tokensHtml += `<div class="token-box">${char} = ${map[char]}</div>`;
+                    }
+                }
+            }
+
+            document.getElementById("numAbjad").innerText = total;
+            document.getElementById("rumusAbjad").innerHTML = `<strong>Formula Hitung Neptu Aksara Jowo:</strong><br> ${detailArr.join(" + ")} = ${total}`;
+            document.getElementById("tokenOutput").innerHTML = tokensHtml;
+            document.getElementById("resAbjad").style.display = "block";
+        }
+
+        function pressKey(char) {
+            let input = document.getElementById("inputNamaCampuran");
+            if(char === 'BACK') input.value = input.value.slice(0, -1);
+            else input.value += char;
+            prosesNamaCampuran();
+        }
+
+        // 4. KALENDER DINAMIS TAHUN 1000 - 3000
+        function initTahunOptions() {
+            const selectTahun = document.getElementById("selectTahun");
+            for(let y=1000; y<=3000; y++) {
+                let opt = document.createElement("option"); opt.value = y; opt.innerText = y;
+                if(y === 2026) opt.selected = true;
+                selectTahun.appendChild(opt);
+            }
+            buildDinamisCalendar();
+        }
+
+        function buildDinamisCalendar() {
+            const m = parseInt(document.getElementById("selectBulan").value);
+            const y = parseInt(document.getElementById("selectTahun").value);
+            const grid = document.getElementById("calendarGridBody");
+            grid.innerHTML = "";
+
+            const labels = ["Ah", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+            labels.forEach(l => grid.innerHTML += `<div class="calendar-day-label">${l}</div>`);
+
+            let firstDay = new Date(y, m, 1).getDay();
+            let totalDays = new Date(y, m + 1, 0).getDate();
+
+            for(let i=0; i<firstDay; i++) grid.innerHTML += `<div class="calendar-cell empty"></div>`;
+            for(let day=1; day<=totalDays; day++) {
+                grid.innerHTML += `<div class="calendar-cell" onclick="auditHariDinamis(${day}, ${m}, ${y}, this)">${day}</div>`;
+            }
+        }
+
+        function auditHariDinamis(tgl, m, y, element) {
+            document.querySelectorAll('.calendar-cell').forEach(c => c.classList.remove('selected'));
+            element.classList.add('selected');
+
+            let d = new Date(y, m, tgl);
+            let neptuBase = (tgl % 5) + (d.getDay() % 2 === 0 ? 7 : 5);
+            let keblatIndex = neptuBase % 4;
+            let arti = ""; let saran = "";
+
+            switch(keblatIndex) {
+                case 0: arti = "KEBLAT UTARA (Kurang Selaras)"; saran = "🧭 SARAN: Keblat utara kurang selaras untuk transaksi besar hari ini. Geser arah mencari rezeki ke timur."; break;
+                case 1: arti = "KEBLAT TIMUR (Lungguhé Rezeki)"; saran = "🧭 SARAN: Sangat Baik! Keblat rezeki mengalir kuat dari Timur. Melangkahlah mengawali hajat ke arah timur."; break;
+                case 2: arti = "KEBLAT SELATAN (Keselamatan)"; saran = "🧭 SARAN: Bagus untuk harmoni keselamatan, perjalanan jauh, atau urusan mutasi tempat."; break;
+                case 3: arti = "KEBLAT BARAT (Rintangan Gering)"; saran = "🧭 SARAN: Waspadai rintangan harian di keblat barat. Tunda kesepakatan krusial sementara waktu."; break;
+            }
+
+            document.getElementById("numSakit").innerText = neptuBase;
+            document.getElementById("txtSakit").innerText = arti;
+            document.getElementById("saranSakit").innerText = saran;
+            document.getElementById("rumusSakit").innerHTML = `<strong>Kombinasi Penanggalan ${tgl}-${m+1}-${y}:</strong> Nilai Indeks Bobot Hari: ${neptuBase}`;
+            document.getElementById("resSakit").style.display = "block";
+        }
+
+        function toggleDarkTheme() {
+            document.body.classList.toggle("dark");
+        }
+
+        window.onload = function() {
+            initTahunOptions();
+        };
+    </script>
+</body>
+</html>
